@@ -1,0 +1,1 @@
+# gyak_naplo

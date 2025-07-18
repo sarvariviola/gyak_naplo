@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Blog lista</title>
+</head>
+<body>
+    <h1>Blogok</h1>
+
+    <!-- Új blog létrehozása link -->
+    <a href="{% url 'blog_create' %}">Új blog létrehozása</a>
+    <br><br>
+
+    <!-- Szűrés űrlap (dátum + kategória egyszerre) -->
+    <form method="get">
+        <label for="id_date">Dátum szerint:</label>
+        {{ form.date }}
+
+        {% if selected_category %}
+            <!-- Rejtett mező, hogy megőrizze a kiválasztott kategóriát -->
+            <input type="hidden" name="category" value="{{ selected_category }}">
+        {% endif %}
+
+        <button type="submit">Szűrés</button>
+    </form>
+
+    <br>
+
+    <!-- Kategória lista szűrő linkekkel -->
+    <h3>Kategóriák:</h3>
+    <ul>
+        {% for category in categories %}
+            <li>
+                <a href="?category={{ category }}{% if form.date.value %}&date={{ form.date.value }}{% endif %}">
+                    {{ category }}
+                </a>
+            </li>
+        {% empty %}
+            <li>Nincsenek kategóriák.</li>
+        {% endfor %}
+    </ul>
+
+    <hr>
+
+    <!-- Blogbejegyzések -->
+    <ul>
+        {% for blog in blogs %}
+            <li>
+                <h2>{{ blog.title }}</h2>
+                <p>{{ blog.content }}</p>
+                <small>Dátum: {{ blog.timestamp }}</small>
+                {% if blog.image %}
+                    <br>
+                    <img src="{{ MEDIA_URL }}{{ blog.image }}" alt="{{ blog.title }}" style="width: 300px; height: auto;">
+                {% endif %}
+            </li>
+            <hr>
+        {% empty %}
+            <li>Nincsenek blogbejegyzések.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

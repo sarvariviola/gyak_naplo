@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Új blog létrehozása</title>
+</head>
+<body>
+    <h1>Új blog létrehozása</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Mentés</button>
+    </form>
+    <a href="{% url 'blog_list' %}">Vissza a listához</a>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ user.username }}'s gallery</title>
+</head>
+<body>
+    <h1>{{ user.username }}'s gallery </h1>
+    <p>Vissza a főoldalra <a href="{% url 'index' %}">Vissza</a></p>
+    {% for blog in blogs %}
+        {% if blog.image %}
+
+       <img src="{{ MEDIA_URL }}{{ blog.image }}" alt="Blog image" style="max-width: 500px; height: auto;;">
+        {% endif %}
+    {% endfor %}
+</body>
+</html>

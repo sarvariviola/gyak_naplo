@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> {{ user.username }}'s work blog</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7eafd;
+            margin: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        a {
+            display: inline-block;
+            margin: 10px 0;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        a:hover {
+            background-color: #0056b3;
+        }
+
+        .logout-button {
+        background-color: #dc3545;
+        color: white;
+        padding: 8px 16px;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        }
+
+        .logout-button:hover {
+        background-color: #a71d2a;
+        }
+
+        #chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            font-family: Arial, sans-serif;
+            z-index: 1000;
+        }
+
+        #chat-header {
+            background-color: #6f42c1;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            text-align: center;
+        }
+
+        #chat-box {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-top: none;
+            max-height: 400px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chat-log {
+            flex-grow: 1;
+            padding: 10px;
+            overflow-y: auto;
+            max-height: 300px;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        #chat-input {
+            border: none;
+            border-top: 1px solid #ccc;
+            padding: 10px;
+            width: calc(100% - 60px);
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        #chat-box button {
+            width: 60px;
+            border: none;
+            background-color: #6f42c1;
+            color: white;
+            cursor: pointer;
+        }
+        </style>
+
+        <script>
+function toggleChat() {
+    const chatBox = document.getElementById('chat-box');
+    chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
+}
+
+function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    if (!message) return;
+
+    const chatLog = document.getElementById('chat-log');
+    chatLog.innerHTML += `<div><strong>Te:</strong> ${message}</div>`;
+    input.value = "";
+
+    fetch("/chatbot/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")  // ha CSRF védelmet használsz
+        },
+        body: JSON.stringify({message: message}),
+    })
+    .then(res => res.json())
+    .then(data => {
+        chatLog.innerHTML += `<div><strong>Bot:</strong> ${data.response}</div>`;
+        chatLog.scrollTop = chatLog.scrollHeight;
+    })
+    .catch(err => {
+        chatLog.innerHTML += `<div><strong>Bot:</strong> Hiba történt.</div>`;
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+</head>
+<body>
+     <h1>Üdvözöllek a blogodon, {{ user.username }} !</h1>
+     <br></br>
+    <a href="{% url 'blog_create' %}">Új blog létrehozása</a>
+    <hr>
+    <a href="{% url 'blog_list' %}">Blogok megtekintése</a>
+    <hr>
+    <a href="{% url 'profile' %}">Profilom</a>
+    <hr>
+    <a href="{% url 'gallery' %}">Galériám</a>
+    <br><br><br><br>
+    <a href="{% url 'logout' %}?next={% url 'login' %}" class="logout-button">Kijelentkezés 🥺🥹😿💔</a>
+
+    <div id="chat-container">
+    <div id="chat-header" onclick="toggleChat()">💬 Chatbot</div>
+    <div id="chat-box" style="display: none;">
+        <div id="chat-log"></div>
+        <input type="text" id="chat-input" placeholder="Írj ide..." onkeydown="if(event.key==='Enter') sendMessage()">
+        <button onclick="sendMessage()">Küldés</button>
+    </div>
+</div>
+</body>
+</html>
